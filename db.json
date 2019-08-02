@@ -1,0 +1,24 @@
+{
+    "Names": [
+        {
+            "id": 1,
+            "name": "Kevin"
+        },
+        {
+            "id": 2,
+            "name": "Marcel"
+        },
+        {
+            "id": 3,
+            "name": "Sabrina"
+        },
+        {
+            "id": 4,
+            "name": "Kai"
+        },
+        {
+            "id": 5,
+            "name": "Lutscher"
+        }
+    ]
+}
