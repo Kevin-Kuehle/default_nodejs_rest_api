@@ -1,0 +1,23 @@
+{
+  "name": "my-api",
+  "version": "0.0.1",
+  "description": "my first API from Kevin Kühle",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "\u0016https://github.com/Kevin-Kuehle/myFirstApi.git"
+  },
+  "keywords": [
+    "API"
+  ],
+  "author": "Kevin Kühle",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "joi": "^14.3.1"
+  }
+}
