@@ -5,33 +5,35 @@ const Fs = require('fs');
 
 app.use(express.json());
 
-// Database Settings
-let dbPath = 'db.json';
-let rawData = Fs.readFileSync(dbPath);
-let parseData = JSON.parse(rawData);
+// Database Init
+let dbFile = 'db.json';
+let rawData = Fs.readFileSync(dbFile);
+const dbData = JSON.parse(rawData);
 
-// Port Setting
+const apiURL = '/api';
 const port = process.env.PORT || 3000;
-
-// API URL
-const apiPath = '/api/courses';
-console.log(parseData);
-
-// rename "dbData" global to like your thinks
-const dbData = parseData;
 
 // Get default response
 app.get('/', (req, res) => {
 	res.send('Hello World');
 });
 
-// Get Data
-app.get(apiPath, (req, res) => {
+// Get all Data
+app.get(apiURL, (req, res) => {
 	res.send(dbData);
 });
 
-// Change Data
-app.post(apiPath, (req, res) => {
+// Get single Data
+app.get(`${apiURL}/:id`, (req, res) => {
+	const data = dbData.find((value) => value.id === parseInt(req.params.id));
+
+	if (!data)
+		return res.status(404).send('Der Kurs wurde nicht mit der ID gefunden.');
+	res.send(data);
+});
+
+// add Data
+app.post(apiURL, (req, res) => {
 	const { error } = validateRequestData(req.body);
 
 	if (error) return res.status(400).send(error.details[0].message);
@@ -41,34 +43,35 @@ app.post(apiPath, (req, res) => {
 		name: req.body.name,
 	};
 	dbData.push(course);
+
+	Fs.writeFile(dbFile, JSON.stringify(dbData), function(err) {
+		if (err) throw err;
+	});
+
 	res.send(course);
 });
 
 // change Data
-app.put(`${apiPath}/:id`, (req, res) => {
-	const course = dbData.find((c) => c.id === parseInt(req.params.id));
+app.put(`${apiURL}/:id`, (req, res) => {
+	const data = dbData.find((c) => c.id === parseInt(req.params.id));
 
-	if (!course)
+	if (!data)
 		return res.status(404).send('Der Kurs wurde nicht mit der ID gefunden.');
 
 	const { error } = validateRequestData(req.body);
 
 	if (error) return res.status(400).send(error.details[0].message);
 
-	course.name = req.body.name;
-	res.send(course);
-});
+	console.log(typeof data);
 
-// Get single Data
-app.get(`${apiPath}/:id`, (req, res) => {
-	const course = dbData.find((c) => c.id === parseInt(req.params.id));
-	if (!course)
-		return res.status(404).send('Der Kurs wurde nicht mit der ID gefunden.');
-	res.send(course);
+	// TODO: Daten in die db.json schreiben.
+
+	data.name = req.body.name;
+	res.send(data);
 });
 
 // delete Data
-app.delete(`${apiPath}/:id`, (req, res) => {
+app.delete(`${apiURL}/:id`, (req, res) => {
 	const course = dbData.find((c) => c.id === parseInt(req.params.id));
 	if (!course)
 		return res.status(404).send('Der Kurs wurde nicht mit der ID gefunden.');
@@ -78,12 +81,12 @@ app.delete(`${apiPath}/:id`, (req, res) => {
 	res.send(course);
 });
 
-function validateRequestData(course) {
+function validateRequestData(data) {
 	const schema = {
 		name: Joi.string().min(3).required(),
 	};
 
-	return Joi.validate(course, schema);
+	return Joi.validate(data, schema);
 }
 
 // PORT
